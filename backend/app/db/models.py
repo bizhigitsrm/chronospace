@@ -1,6 +1,6 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Table
-from sqlalchemy.orm import relationship
+from sqlalchemy import Integer, String, Text, DateTime, ForeignKey, Table, Column
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from .base import Base
 
 # Association table for many-to-many relationship between events and categories
@@ -14,41 +14,41 @@ event_category = Table(
 class Event(Base):
     __tablename__ = "events"
 
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(255), nullable=False)
-    description = Column(Text)
-    date = Column(DateTime, nullable=False)
-    location = Column(String(255))
-    importance = Column(Integer, default=1)  # Scale 1-5
-    media_url = Column(String(512))  # URL to image/video
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str] = mapped_column(Text)
+    date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    location: Mapped[str] = mapped_column(String(255))
+    importance: Mapped[int] = mapped_column(default=1)  # Scale 1-5
+    media_url: Mapped[str] = mapped_column(String(512))  # URL to image/video
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    epoch_id = Column(Integer, ForeignKey('epochs.id'))
+    epoch_id: Mapped[int] = mapped_column(ForeignKey('epochs.id'))
     epoch = relationship("Epoch", back_populates="events")
     categories = relationship("Category", secondary=event_category, back_populates="events")
 
 class Category(Base):
     __tablename__ = "categories"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), nullable=False, unique=True)
-    description = Column(Text)
-    color = Column(String(7))  # Hex color code
-    icon = Column(String(100))  # Icon identifier
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    description: Mapped[str] = mapped_column(Text)
+    color: Mapped[str] = mapped_column(String(7))  # Hex color code
+    icon: Mapped[str] = mapped_column(String(100))  # Icon identifier
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     events = relationship("Event", secondary=event_category, back_populates="categories")
 
 class Epoch(Base):
     __tablename__ = "epochs"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), nullable=False, unique=True)
-    description = Column(Text)
-    start_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
-    color = Column(String(7))  # Hex color code
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    description: Mapped[str] = mapped_column(Text)
+    start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    color: Mapped[str] = mapped_column(String(7))  # Hex color code
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     events = relationship("Event", back_populates="epoch")
