@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -19,13 +19,13 @@ class CRUDBase:
 
     async def get_multi(
         self, db: AsyncSession, *, skip: int = 0, limit: int = 100
-    ) -> List[any]:
+    ) -> List[Any]:
         result = await db.execute(
             select(self.model).offset(skip).limit(limit)
         )
-        return result.scalars().all()
+        return list(result.scalars().all())
 
-    async def create(self, db: AsyncSession, *, obj_in: any) -> any:
+    async def create(self, db: AsyncSession, *, obj_in: Any) -> Any:
         db_obj = self.model(**obj_in.dict())
         db.add(db_obj)
         await db.commit()
@@ -88,7 +88,7 @@ class CRUDEvent(CRUDBase):
 
         query = query.offset(skip).limit(limit)
         result = await db.execute(query)
-        return result.scalars().all()
+        return list(result.scalars().all())
 
 class CRUDCategory(CRUDBase):
     async def get_by_name(self, db: AsyncSession, name: str) -> Optional[Category]:
