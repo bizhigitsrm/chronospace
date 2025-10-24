@@ -1,5 +1,7 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
+from app.core.config import settings
+from app.api import events
 
 # Support both package-relative imports (production) and absolute imports
 # when tests run with PYTHONPATH pointing to backend/app.
