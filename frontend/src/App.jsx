@@ -44,28 +44,31 @@ function App() {
 
   // Filter events when filters change
   useEffect(() => {
-    const fetchFilteredEvents = async () => {
-      try {
-        let params = new URLSearchParams();
+    // Prevent initial run
+    if (!loading) {
+      const fetchFilteredEvents = async () => {
+        try {
+          let params = new URLSearchParams();
 
-        if (selectedCategories.length > 0) {
-          selectedCategories.forEach(id => params.append('category_id', id));
+          if (selectedCategories.length > 0) {
+            selectedCategories.forEach(id => params.append('category_id', id));
+          }
+          if (selectedEpochs.length > 0) {
+            selectedEpochs.forEach(id => params.append('epoch_id', id));
+          }
+          if (startDate) params.append('start_date', startDate);
+          if (endDate) params.append('end_date', endDate);
+
+          const response = await axios.get(`${API_BASE_URL}/events?${params}`);
+          setEvents(response.data);
+        } catch (err) {
+          setError('Failed to fetch filtered events');
         }
-        if (selectedEpochs.length > 0) {
-          selectedEpochs.forEach(id => params.append('epoch_id', id));
-        }
-        if (startDate) params.append('start_date', startDate);
-        if (endDate) params.append('end_date', endDate);
+      };
 
-        const response = await axios.get(`${API_BASE_URL}/events?${params}`);
-        setEvents(response.data);
-      } catch (err) {
-        setError('Failed to fetch filtered events');
-      }
-    };
-
-    fetchFilteredEvents();
-  }, [selectedCategories, selectedEpochs, startDate, endDate]);
+      fetchFilteredEvents();
+    }
+  }, [selectedCategories, selectedEpochs, startDate, endDate, loading]);
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategories(prev =>
